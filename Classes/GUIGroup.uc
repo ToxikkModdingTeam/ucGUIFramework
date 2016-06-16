@@ -172,15 +172,21 @@ function RemoveChild(GUIGroup elem)
 {
     local int i;
 
-    for ( i=0; i<Children.length; i++ )
-    {
-        if ( Children[i] == elem )
-        {
-            Children[i].Parent = None;
-            Children.Remove(i,1);
-            break;
-        }
-    }
+	i = Children.Find(elem);
+	if ( i != INDEX_NONE )
+	{
+		Children[i].Parent = None;
+		Children.Remove(i,1);
+	}
+}
+
+function RemoveFromParent()
+{
+	if ( Parent != None )
+	{
+		Parent.Children.RemoveItem(Self);
+		Parent = None;
+	}
 }
 
 function SetEnabled(bool newEnabled)
