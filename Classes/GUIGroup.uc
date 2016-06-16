@@ -551,13 +551,17 @@ function DrawBox(Canvas C, int X, int Y, int W, int H, Color Col)
     C.DrawRect(W+1, 1);
 }
 
-function Free()
+function Clear()
 {
 	local int i;
-
 	for ( i=0; i<Children.Length; i++ )
 		Children[i].Free();
+	Children.Length = 0;
+}
 
+function Free()
+{
+	Clear();
 	OnDraw = None;
 	OnHover = None;
 	OnLeftMouse = None;

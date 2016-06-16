@@ -17,7 +17,7 @@ var int TextPaddingY;
 var sColorAnim TextColor;
 var sFloatAnim Scale;
 
-static function GUILabel CreateLabel(optional GUIGroup _Parent=None, optional String _Text="label")
+static function GUILabel CreateLabel(optional GUIGroup _Parent=None, optional coerce String _Text="label")
 {
 	local GUILabel lbl;
 	lbl = new(None) class'GUILabel';

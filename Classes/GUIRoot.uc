@@ -114,15 +114,6 @@ function bool MouseInBounds(int X1, int Y1, int X2, int Y2)
     return (MousePos.X >= X1 && MousePos.X <= X2 && MousePos.Y >= Y1 && MousePos.Y <= Y2);
 }
 
-function Clear()
-{
-	local int i;
-
-	for ( i=0; i<Children.Length; i++ )
-		Children[i].Free();
-	Children.Length = 0;
-}
-
 static function Vector2D GetCanvasMousePos(Canvas C, GameViewportClient gViewport)
 {
     local Vector2D p;
