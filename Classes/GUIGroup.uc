@@ -217,7 +217,7 @@ function SetAlign(eHorAlignment newAlignX, eVerAlignment newAlignY)
 // offset: "42"
 // relative+offset: "50%+42"
 // unchanged: "_"
-function SetPos(String strX, String strY, String strW, String strH)
+function SetPos(coerce String strX, coerce String strY, coerce String strW, coerce String strH)
 {
 	ParsePositionString(strX, relX.Val, offX.Val);
 	relX.Queue.Length = 0;
@@ -304,7 +304,7 @@ function SetPosAuto(String str)
 	offH.Queue.Length = 0;
 }
 
-function MoveTo(String strX, String strY, String strW, String strH, float Dur, eAnimMode Mode)
+function MoveTo(coerce String strX, coerce String strY, coerce String strW, coerce String strH, float Dur, eAnimMode Mode)
 {
 	relX.Queue.Length = 0;
 	offX.Queue.Length = 0;
@@ -318,7 +318,7 @@ function MoveTo(String strX, String strY, String strW, String strH, float Dur, e
     QueueMove(strX, strY, strW, strH, Dur, Mode);
 }
 
-function QueueMove(String strX, String strY, String strW, String strH, float Dur, eAnimMode Mode)
+function QueueMove(coerce String strX, coerce String strY, coerce String strW, coerce String strH, float Dur, eAnimMode Mode)
 {
     local int i;
 
