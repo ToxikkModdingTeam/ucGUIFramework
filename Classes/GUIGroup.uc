@@ -101,6 +101,7 @@ var int zIndex;             // defines order to draw the array of Children
                             // an element zIndex is only relevant to its brothers and sisters
 
 var array<String> Data;
+var array<int> iData;
 
 // cycle vars
 var int absX, absY;			// absolute positions computed every Tick
@@ -402,6 +403,32 @@ function QueueColors(Color newBg, Color newBox, float Dur, eAnimMode Mode)
     }
 }
 
+function FadeIn(optional float TargetAlpha=1.0, optional float Dur=0.5)
+{
+	AlphaTo(TargetAlpha, Dur, ANIM_EASE_IN);
+}
+
+function FadeOut(optional float TargetAlpha=0.0, optional float Dur=0.3)
+{
+	AlphaTo(TargetAlpha, Dur, ANIM_EASE_OUT);
+}
+
+function Fade(bool bIn, optional float OutAlpha=0, optional float InAlpha=1, optional float OutDur=0.3, optional float InDur=0.5)
+{
+	bIn ? FadeIn(InAlpha, InDur) : FadeOut(OutAlpha, OutDur);
+}
+
+function FlashColors(optional Color FlashBg=MakeColor(255,200,128,220), optional Color FlashBox=CurTargetColor(BoxColor), optional float inDur=0.2, optional float outDur=1.0)
+{
+	local Color bakBg, bakBox;
+
+	bakBg = CurTargetColor(BgColor);
+	bakBox = CurTargetColor(BoxColor);
+
+	ColorsTo(FlashBg, FlashBox, inDur, ANIM_LINEAR);
+	QueueColors(bakBg, bakBox, outDur, ANIM_LINEAR);
+}
+
 function SetAlpha(float newVal)
 {
     Alpha.Val = newVal;
@@ -573,6 +600,20 @@ function Free()
 	OnLeftMouse = None;
 	OnHold = None;
 	OnRightMouse = None;
+}
+
+static function float CurTargetFloat(out sFloatAnim f)
+{
+	if ( f.Queue.Length > 0 )
+		return f.Queue[f.Queue.Length-1].Target;
+	return f.Val;
+}
+
+static function Color CurTargetColor(out sColorAnim c)
+{
+	if ( c.Queue.Length > 0 )
+		return c.Queue[c.Queue.Length-1].Target;
+	return c.Val;
 }
 
 static function AnimFloat(out sFloatAnim f, float dt)
