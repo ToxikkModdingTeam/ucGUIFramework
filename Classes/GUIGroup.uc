@@ -327,6 +327,43 @@ function MoveTo(coerce String strX, coerce String strY, coerce String strW, coer
     QueueMove(strX, strY, strW, strH, Dur, Mode);
 }
 
+// This is actually an improvement to support animating only a single dimension.
+// With MoveTo you have to pass "_" for values you don't wanna change, but it still resets queue and stops current anims
+// NOTE: this doesn't support alignments, so you can only pass x,y,width,height (and not left,right,center-x etc.)
+function MoveToAuto(String str, float Dur, eAnimMode Mode)
+{
+	local array<String> Parts;
+	local int i;
+	local array<String> KV;
+
+	Parts = SplitString(Caps(Repl(str, " ", "")), ";", true);
+	for ( i=0; i<Parts.length; i++ )
+	{
+		KV.Length = 0;
+		KV = SplitString(Parts[i], ":", true);
+		if ( KV.length == 2 )
+		{
+			if ( KV[0] == "X" ) {
+				relX.Queue.Length = 0;
+				offX.Queue.Length = 0;
+				__QueueMove(KV[1], relX, offX, 0, Dur, Mode);
+			} else if ( KV[0] == "Y" ) {
+				relY.Queue.Length = 0;
+				offY.Queue.Length = 0;
+				__QueueMove(KV[1], relY, offY, 0, Dur, Mode);
+			} else if ( KV[0] == "WIDTH" ) {
+				relW.Queue.Length = 0;
+				offW.Queue.Length = 0;
+				__QueueMove(KV[1], relW, offW, 0, Dur, Mode);
+			} else if ( KV[0] == "HEIGHT" ) {
+				relH.Queue.Length = 0;
+				offH.Queue.Length = 0;
+				__QueueMove(KV[1], relH, offH, 0, Dur, Mode);
+			}
+		}
+	}
+}
+
 function QueueMove(coerce String strX, coerce String strY, coerce String strW, coerce String strH, float Dur, eAnimMode Mode)
 {
     local int i;
