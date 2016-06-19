@@ -273,36 +273,44 @@ function SetPosAuto(String str)
 			if ( KV[0] == "LEFT" ) {
 				AlignX = ALIGN_LEFT;
 				ParsePositionString(KV[1], relX.Val, offX.Val);
+				relX.Queue.Length = 0;
+				offX.Queue.Length = 0;
 			} else if ( KV[0] == "CENTER-X" ) {
 				AlignX = ALIGN_CENTER;
 				ParsePositionString(KV[1], relX.Val, offX.Val);
+				relX.Queue.Length = 0;
+				offX.Queue.Length = 0;
 			} else if ( KV[0] == "RIGHT" ) {
 				AlignX = ALIGN_RIGHT;
 				ParsePositionString(KV[1], relX.Val, offX.Val);
+				relX.Queue.Length = 0;
+				offX.Queue.Length = 0;
 			} else if ( KV[0] == "TOP" ) {
 				AlignY = ALIGN_TOP;
 				ParsePositionString(KV[1], relY.Val, offY.Val);
+				relY.Queue.Length = 0;
+				offY.Queue.Length = 0;
 			} else if ( KV[0] == "CENTER-Y" ) {
 				AlignY = ALIGN_MIDDLE;
 				ParsePositionString(KV[1], relY.Val, offY.Val);
+				relY.Queue.Length = 0;
+				offY.Queue.Length = 0;
 			} else if ( KV[0] == "BOTTOM" ) {
 				AlignY = ALIGN_BOTTOM;
 				ParsePositionString(KV[1], relY.Val, offY.Val);
+				relY.Queue.Length = 0;
+				offY.Queue.Length = 0;
 			} else if ( KV[0] == "WIDTH" ) {
 				ParsePositionString(KV[1], relW.Val, offW.Val);
+				relW.Queue.Length = 0;
+				offW.Queue.Length = 0;
 			} else if ( KV[0] == "HEIGHT" ) {
 				ParsePositionString(KV[1], relH.Val, offH.Val);
+				relH.Queue.Length = 0;
+				offH.Queue.Length = 0;
 			}
 		}
 	}
-	relX.Queue.Length = 0;
-	offX.Queue.Length = 0;
-	relY.Queue.Length = 0;
-	offY.Queue.Length = 0;
-	relW.Queue.Length = 0;
-	offW.Queue.Length = 0;
-	relH.Queue.Length = 0;
-	offH.Queue.Length = 0;
 }
 
 function MoveTo(coerce String strX, coerce String strY, coerce String strW, coerce String strH, float Dur, eAnimMode Mode)
