@@ -506,27 +506,38 @@ function QueueAlpha(float newVal, float Dur, eAnimMode Mode)
 
 function CalcSizes(float dt)
 {
-	AnimFloat(relW, dt);
-	AnimFloat(offW, dt);
+	// optimize by avoiding useless calls...?
+	if ( relW.Queue.Length > 0 )
+		AnimFloat(relW, dt);
+	if ( offW.Queue.Length > 0 )
+		AnimFloat(offW, dt);
 	absW = (relW.Val * Parent.absW) + offW.Val;
 
-	AnimFloat(relH, dt);
-	AnimFloat(offH, dt);
+	if ( relH.Queue.Length > 0 )
+		AnimFloat(relH, dt);
+	if ( offH.Queue.Length > 0 )
+		AnimFloat(offH, dt);
 	absH = (relH.Val * Parent.absH) + offH.Val;
 }
 
 function CalcPos(float dt)
 {
-	AnimFloat(relX, dt);
-	AnimFloat(offX, dt);
+	if ( relX.Queue.Length > 0 )
+		AnimFloat(relX, dt);
+	if ( offX.Queue.Length > 0 )
+		AnimFloat(offX, dt);
+
 	absX = Parent.absX + (relX.Val * Parent.absW) + offX.Val;
 	if ( AlignX == ALIGN_CENTER )
 		absX -= absW / 2;
 	else if ( AlignX == ALIGN_RIGHT )
 		absX -= absW;
 
-	AnimFloat(relY, dt);
-	AnimFloat(offY, dt);
+	if ( relY.Queue.Length > 0 )
+		AnimFloat(relY, dt);
+	if ( offY.Queue.Length > 0 )
+		AnimFloat(offY, dt);
+
 	absY = Parent.absY + (relY.Val * Parent.absH) + offY.Val;
 	if ( AlignY == ALIGN_MIDDLE )
 		absY -= absH / 2;
@@ -536,10 +547,13 @@ function CalcPos(float dt)
 
 function GUITick(float dt)
 {
-    AnimColor(BgColor, dt);
-    AnimColor(BoxColor, dt);
+	if ( BgColor.Queue.Length > 0 )
+		AnimColor(BgColor, dt);
+	if ( BoxColor.Queue.Length > 0 )
+		AnimColor(BoxColor, dt);
 
-    AnimFloat(Alpha, dt);
+	if ( Alpha.Queue.Length > 0 )
+		AnimFloat(Alpha, dt);
 
     if ( bCaptureMouse && bEnabled && bGroupEnabled && Root.MouseInBounds(absX, absY, absX+absW, absY+absH) )
         Root.Hovering = Self;
@@ -563,12 +577,19 @@ function InternalOnDraw(GUIGroup elem, Canvas C)
 {
     if ( BgColor.Val.A > 0 )
     {
-        SetDrawColor(C, BgColor.Val);
+		//SetDrawColor(C, BgColor.Val);
+		C.SetDrawColor(BgColor.Val.R, BgColor.Val.G, BgColor.Val.B, BgColor.Val.A * Alpha.Val * AlphaMultiplier);
         C.SetPos(absX, absY);
         if ( Texture != None )
-            C.DrawRect(absW, absH, Texture);
+        {
+            //C.DrawRect(absW, absH, Texture);
+			C.DrawTile(Texture, absW, absH, 0, 0, Texture.GetSurfaceWidth(), Texture.GetSurfaceHeight());
+        }
         else
-            C.DrawRect(absW, absH);
+        {
+            //C.DrawRect(absW, absH);
+			C.DrawTile(C.DefaultTexture, absW, absH, 0, 0, 32, 32);
+        }
     }
     if ( BoxColor.Val.A > 0 )
     {
@@ -594,6 +615,11 @@ function PostDraw(Canvas C)
     }
 }
 
+function bool ShouldDraw()
+{
+	return (Alpha.Val * AlphaMultiplier > 0);
+}
+
 function int CompareZIndex(GUIGroup e1, GUIGroup e2) { return (e2.zIndex - e1.zIndex); }
 
 function SetDrawColor(Canvas C, Color Col)
@@ -606,27 +632,49 @@ function SetDrawColor4(Canvas C, byte R, byte G, byte B, byte A)
     C.SetDrawColor(R, G, B, A * Alpha.Val * AlphaMultiplier);
 }
 
+function Color ApplyAlpha(Color Col)
+{
+	return MakeColor(Col.R, Col.G, Col.B, Col.A * Alpha.Val * AlphaMultiplier);
+}
+function Color ApplyAlpha4(byte R, byte G, byte B, byte A)
+{
+	return MakeColor(R, G, B, A * Alpha.Val * AlphaMultiplier);
+}
+
+//TODO: see if we can optimize this with Draw2DLine instead of DrawRect/DrawTile
 function DrawBox(Canvas C, int X, int Y, int W, int H, Color Col)
 {
-    SetDrawColor4(C, Col.R, Col.G, Col.B, Col.A / 2);
-    C.SetPos(X+1, Y+1);
-    C.DrawRect(1, H-2);
-    C.SetPos(X+1, Y+1);
-    C.DrawRect(W-2, 1);
-    C.SetPos(X+W-1, Y+1);
-    C.DrawRect(1, H-1);
-    C.SetPos(X+1, Y+H-1);
-    C.DrawRect(W-1, 1);
-    
-    SetDrawColor(C, Col);
-    C.SetPos(X, Y);
-    C.DrawRect(1, H);
-    C.SetPos(X, Y);
-    C.DrawRect(W, 1);
-    C.SetPos(X+W, Y);
-    C.DrawRect(1, H+1);
-    C.SetPos(X, Y+H);
-    C.DrawRect(W+1, 1);
+	C.PreOptimizeDrawTiles(8, C.DefaultTexture);
+
+	//SetDrawColor4(C, Col.R, Col.G, Col.B, Col.A / 2.0);
+	C.SetDrawColor(Col.R, Col.G, Col.B, (Col.A / 2.0) * Alpha.Val * AlphaMultiplier);
+	C.SetPos(X+1, Y+1);
+	//C.DrawRect(1, H-2);
+	C.DrawTile(C.DefaultTexture, 1, H-2, 0, 0, 32, 32);
+	C.SetPos(X+1, Y+1);
+	//C.DrawRect(W-2, 1);
+	C.DrawTile(C.DefaultTexture, W-2, 1, 0, 0, 32, 32);
+	C.SetPos(X+W-1, Y+1);
+	//C.DrawRect(1, H-1);
+	C.DrawTile(C.DefaultTexture, 1, H-1, 0, 0, 32, 32);
+	C.SetPos(X+1, Y+H-1);
+	//C.DrawRect(W-1, 1);
+	C.DrawTile(C.DefaultTexture, W-1, 1, 0, 0, 32, 32);
+
+	//SetDrawColor(C, Col);
+	C.SetDrawColor(Col.R, Col.G, Col.B, Col.A * Alpha.Val * AlphaMultiplier);
+	C.SetPos(X, Y);
+	//C.DrawRect(1, H);
+	C.DrawTile(C.DefaultTexture, 1, H, 0, 0, 32, 32);
+	C.SetPos(X, Y);
+	//C.DrawRect(W, 1);
+	C.DrawTile(C.DefaultTexture, W, 1, 0, 0, 32, 32);
+	C.SetPos(X+W, Y);
+	//C.DrawRect(1, H+1);
+	C.DrawTile(C.DefaultTexture, 1, H+1, 0, 0, 32, 32);
+	C.SetPos(X, Y+H);
+	//C.DrawRect(W+1, 1);
+	C.DrawTile(C.DefaultTexture, W+1, 1, 0, 0, 32, 32);
 }
 
 function Clear()

@@ -88,6 +88,36 @@ function DrawBox(Canvas C, int X, int Y, int W, int H, Color Col)
 	C.DrawRect(1, H/4);
 }
 
+function String GetBestAutoPos()
+{
+	local float left, top;
+	local String hor, ver;
+
+	CalcPos(0);
+
+	left = absX - Parent.absX;
+	if ( left+absW >= 0.75*Parent.absW )
+		hor = "right:100%-" $ Round(Parent.absW - (left+absW));
+	else if ( left <= 0.25*Parent.absW )
+		hor = "left:" $ Round(left);
+	else if ( left+absW/2 < 0.5*Parent.absW )
+		hor = "center-x:50%-" $ Round(0.5*Parent.absW - (left+absW/2));
+	else
+		hor = "center-x:50%+" $ Round(left+absW/2 - 0.5*Parent.absW);
+
+	top = absY - Parent.absY;
+	if ( top+absH >= 0.75*Parent.absH )
+		ver = "bottom:100%-" $ Round(Parent.absH - (top+absH));
+	else if ( top<= 0.25*Parent.absH )
+		ver = "top:" $ Round(top);
+	else if ( top+absH/2 < 0.5*Parent.absH )
+		ver = "center-y:50%-" $ Round(0.5*Parent.absH - (top+absH/2));
+	else
+		ver = "center-y:50%+" $ Round(top+absH/2 - 0.5*Parent.absH);
+
+	return (hor $ ";" $ ver);
+}
+
 defaultproperties
 {
 	offW=(Val=128)
